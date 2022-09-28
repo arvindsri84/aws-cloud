@@ -1,0 +1,39 @@
+Resources:
+  HelloLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: HelloLambdaRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  HelloLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: HelloLambdaFunction
+      Role: !GetAtt HelloLambdaRole.Arn
+      Runtime: java11
+      Handler: in.arvindsri82.cloud.SNSEventHandler
+      Code:
+        S3Bucket: arvindsri82-lambda-functions
+        S3Key: handler-function-v3.zip
+
+  HelloLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HelloLambdaFunction
+      Principal: sns.amazonaws.com
+
+  MyTopicSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: lambda
+      TopicArn: arn:aws:sns:ap-south-1:244544013937:MyFirstTopic
+      Endpoint: !GetAtt HelloLambdaFunction.Arn
+      FilterPolicy: '{"category":["Prod"]}'
