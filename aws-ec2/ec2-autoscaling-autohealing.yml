@@ -61,10 +61,13 @@ Resources:
         LaunchTemplateId: !Ref SampleLaunchTemplate
         Version: !GetAtt SampleLaunchTemplate.LatestVersionNumber
       Tags:
-        - Key: Name
+        - Key: env
           Value: !Ref EnvironmentName
           PropagateAtLaunch: true
-  
+        - Key: app
+          Value: sys-monit-autoscaling-group
+          PropagateAtLaunch: true
+
   SampleLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:

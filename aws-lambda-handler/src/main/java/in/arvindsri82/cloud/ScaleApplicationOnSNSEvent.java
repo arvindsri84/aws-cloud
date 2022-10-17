@@ -8,7 +8,7 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent;
 
-public class InstanceRefreshOnSNSEvent implements RequestHandler<SNSEvent, String> {
+public class ScaleApplicationOnSNSEvent implements RequestHandler<SNSEvent, String> {
 
     public String handleRequest(SNSEvent snsEvent, Context context) {
         LambdaLogger logger = context.getLogger();
@@ -16,24 +16,24 @@ public class InstanceRefreshOnSNSEvent implements RequestHandler<SNSEvent, Strin
         logger.log(snsEvent.toString());
 
         var client = AmazonAutoScalingClient.builder().build();
-
         var asgName = getAutoScalingGroupName(client);
         logger.log("Autoscaling group name " + asgName);
 
-        var request = new StartInstanceRefreshRequest();
+        var capacity = getCapacity();
+        logger.log("Autoscaling group new capacity " + capacity);
+
+        var request = new UpdateAutoScalingGroupRequest();
+        request.setDesiredCapacity(capacity);
+        request.setMinSize(capacity);
+        request.setMaxSize(capacity);
         request.setAutoScalingGroupName(asgName);
-        request.setStrategy("Rolling");
 
-        var refreshPreference = new RefreshPreferences();
-        refreshPreference.setMinHealthyPercentage(50);
-        refreshPreference.setInstanceWarmup(300);
-        request.setPreferences(refreshPreference);
-
-        client.startInstanceRefresh(request);
+        var result = client.updateAutoScalingGroup(request);
         logger.log("Event Processed ..");
 
         return "Success";
     }
+
 
     private String getAutoScalingGroupName(AmazonAutoScaling client) {
         var asgName = System.getenv("ASG_NAME");
@@ -50,4 +50,12 @@ public class InstanceRefreshOnSNSEvent implements RequestHandler<SNSEvent, Strin
         return asgName;
     }
 
+
+    private Integer getCapacity() {
+        var capacity = System.getenv("ASG_CAPACITY");
+        if (capacity == null || capacity.trim().length() == 0) {
+            return 0;
+        }
+        return Integer.valueOf(capacity);
+    }
 }

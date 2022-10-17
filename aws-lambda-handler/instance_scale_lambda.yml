@@ -1,0 +1,62 @@
+Resources:
+  ScaleAppLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ScaleAppLambdaRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: lambdaExecution-ScaleAppHandler
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - autoscaling:Describe*
+                  - autoscaling:UpdateAutoScalingGroup
+                Resource: '*'
+
+  ScaleAppLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: ScaleAppLambdaFunction
+      Role: !GetAtt ScaleAppLambdaRole.Arn
+      Runtime: java11
+      Handler: in.arvindsri82.cloud.ScaleApplicationOnSNSEvent
+      MemorySize: 512
+      Timeout: 300
+      Code:
+        S3Bucket: arvindsri82-lambda-functions
+        S3Key: handler-function-v4.zip
+      Environment:
+        Variables:
+          ASG_TAG_VALUE: "sys-monit-autoscaling-group"
+          ASG_CAPACITY: "0"
+
+  ScaleAppLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ScaleAppLambdaFunction
+      Principal: sns.amazonaws.com
+
+  MyTopicSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: lambda
+      TopicArn: arn:aws:sns:ap-south-1:244544013937:MyFirstTopic
+      Endpoint: !GetAtt ScaleAppLambdaFunction.Arn
+      #FilterPolicy: '{"category":["Prod"]}'
