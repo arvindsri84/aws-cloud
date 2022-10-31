@@ -67,6 +67,9 @@ Resources:
         - Key: app
           Value: sys-monit-autoscaling-group
           PropagateAtLaunch: true
+        - Key: service
+          Value: MyTestTag
+          PropagateAtLaunch: true
 
   SampleLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate

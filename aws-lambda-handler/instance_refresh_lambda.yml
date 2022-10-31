@@ -25,9 +25,15 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action:
-                  - autoscaling:StartInstanceRefresh
-                  - autoscaling:Describe*
+                  - autoscaling:DescribeAutoScalingGroups
                 Resource: '*'
+              - Effect: Allow
+                Action:
+                  - autoscaling:StartInstanceRefresh
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    autoscaling:ResourceTag/service: "MyTestTag"
 
   HelloLambdaFunction:
     Type: AWS::Lambda::Function

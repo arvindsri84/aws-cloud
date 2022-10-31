@@ -7,3 +7,6 @@ aws s3 cp .\handler-function-v3.zip s3://arvindsri82-lambda-functions/handler-fu
 aws cloudformation create-stack --stack-name hello-lambda-stack --template-body file://lambda_deploy.yml --capabilities CAPABILITY_NAMED_IAM
 aws cloudformation delete-stack --stack-name hello-lambda-stack
 aws cloudformation delete-stack --stack-name hello-lambda-stack
+
+
+aws cloudformation create-stack --stack-name instance-refresh-lambda --template-body file://instance_refresh_lambda.yml --capabilities CAPABILITY_NAMED_IAM

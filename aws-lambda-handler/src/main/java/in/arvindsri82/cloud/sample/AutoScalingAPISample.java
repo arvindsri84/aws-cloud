@@ -12,7 +12,7 @@ public class AutoScalingAPISample {
 
         var asgName = describeByTagValue(client);
         //updateCapacity(client, asgName, 0);
-        updateCapacity(client, asgName, 2);
+        //updateCapacity(client, asgName, 2);
     }
 
     private static String describeByTagValue(AmazonAutoScaling client) {
