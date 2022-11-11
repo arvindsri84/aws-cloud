@@ -1,0 +1,12 @@
+{
+	"test_account": {
+		"alias": "TEST_ACCOUNT",
+		"active": "test_account",
+		"passive": "test_account_u2"
+	},
+	"dev_account": {
+		"alias": "DEV_ACCOUNT",
+		"active": "dev_account",
+		"passive": "dev_account_u2"
+	}
+}
