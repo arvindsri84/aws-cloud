@@ -2,15 +2,16 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   EnvironmentName:
     Type: String
-    Default: "EC2 Hello World "
+    Default: "EC2 Hello World"
   InstanceType:
     Description: The EC2 instance type
     Type: String
-    Default: t3.micro
+    Default: t3a.small
     AllowedValues:
       - t3.micro
       - t3.small
       - t3.medium
+      - t3a.small
   KeyName:
     Description: Name of an existing EC2 key pair to allow SSH access to the instances
     Type: 'AWS::EC2::KeyPair::KeyName'
@@ -150,8 +151,8 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
+        FromPort: 443
+        ToPort: 443
         CidrIp: 0.0.0.0/0
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -190,12 +191,14 @@ Resources:
   ALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
+      Certificates:
+        - arn:aws:acm:ap-south-1:127688231907:certificate/e01530a9-2c0a-45e0-b14c-754d5b1333f2
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref EC2TargetGroup
       LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 80
-      Protocol: HTTP
+      Port: 443
+      Protocol: HTTPS
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -208,6 +211,12 @@ Resources:
         - !GetAtt ELBSecurityGroup.GroupId
   LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          files:
+            /var/www/html/index2.html:
+              content: TestString
     Properties: 
       LaunchTemplateName: !Sub ${AWS::StackName}-launch-template
       LaunchTemplateData:
@@ -217,14 +226,37 @@ Resources:
         SecurityGroupIds: 
           - !Ref EC2SecurityGroup
         IamInstanceProfile:
-          Arn: !GetAtt HelloWorldAppInstanceProfile.Arn          
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash
-            sudo yum install -y java-17-amazon-corretto
-            mkdir -p /apps/bin
-            aws s3 cp s3://proof-of-concepts-zyvika/hello-world-springboot-0.0.1-SNAPSHOT.jar /apps/bin/hello-world.jar
-            java -jar /apps/bin/hello-world.jar &
+          Arn: !GetAtt HelloWorldAppInstanceProfile.Arn
+        UserData: !Base64
+          'Fn::Join':
+            - ''
+            - - |
+                #!/bin/bash -xe
+              - |
+                yum update -y aws-cfn-bootstrap
+              - |
+                # Install the files and packages from the metadata
+              - '/opt/aws/bin/cfn-init -v '
+              - '         --stack '
+              - !Ref 'AWS::StackName'
+              - '         --resource LaunchTemplate '
+              - '         --configsets InstallAndRun '
+              - '         --region '
+              - !Ref 'AWS::Region'
+              - |+
+
+              - |
+                # Signal the status from cfn-init
+              - '/opt/aws/bin/cfn-signal -e $? '
+              - '         --stack '
+              - !Ref 'AWS::StackName'
+              - '         --resource LaunchTemplate '
+              - '         --region '
+              - !Ref 'AWS::Region'
+              - |+ 
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT5M
   WebServerGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:

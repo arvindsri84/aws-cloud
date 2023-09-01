@@ -15,6 +15,7 @@
 	<description>Hello word for Spring Boot 3.1.2 with Java 17</description>
 	<properties>
 		<java.version>17</java.version>
+		<maven.build.timestamp.format>MMddyyHHmm</maven.build.timestamp.format>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -49,6 +50,25 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/assembly/src.xml</descriptor>
+					</descriptors>
+					<finalName>${project.artifactId}-${project.version}-b${maven.build.timestamp}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

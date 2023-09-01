@@ -11,9 +11,9 @@ public class SayHello {
     @GetMapping( path = "/hello")
     public String Hello(String name){
         if( name == null || name.trim().length() == 0){
-            return "Hello World!";
+            return "Hello World my friend!";
         }
-        return "Hello, " + name + "!";
+        return "Hello my friend, " + name + "!";
     }
 
 }
