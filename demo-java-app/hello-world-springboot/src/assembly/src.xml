@@ -10,6 +10,7 @@
         <file>
              <source>target/${artifactId}-${version}.jar</source>
             <outputDirectory>bin</outputDirectory>
+            <fileMode>0774</fileMode>
         </file>
         <file>
             <source>src/scripts/run.sh</source>

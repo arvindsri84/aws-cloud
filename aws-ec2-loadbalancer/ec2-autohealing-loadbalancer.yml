@@ -25,7 +25,7 @@ Parameters:
     Type: String
     MinLength: 9
     MaxLength: 18
-    Default: 14.97.134.98/32
+    Default: 182.69.183.75/32
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
 Resources:
   VPC:
@@ -137,7 +137,9 @@ Resources:
               - Effect: Allow
                 Action: [ "s3:Get*","s3:List*" ]
                 Resource: "arn:aws:s3:::*"
-
+              - Effect: Allow
+                Action: [ "logs:CreateLogGroup","logs:CreateLogStream", "logs:PutLogEvents","logs:DescribeLogStreams" ]
+                Resource: "*"
   HelloWorldAppInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -212,12 +214,117 @@ Resources:
   LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Metadata:
-      AWS::CloudFormation::Init:
-        config:
+      'AWS::CloudFormation::Init':
+        configSets:
+          InstallAndRun:
+            - Install
+            - Configure
+        Install:
+          packages:
+            yum:
+              java-17-amazon-corretto: []
+              unzip: []
+              awslogs: []
           files:
-            /var/www/html/index2.html:
-              content: TestString
-    Properties: 
+            /etc/cfn/cfn-hup.conf:
+              content: !Join
+                - ''
+                - - |
+                    [main]
+                  - stack=
+                  - !Ref 'AWS::StackId'
+                  - |+
+
+                  - region=
+                  - !Ref 'AWS::Region'
+                  - |+
+
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Join
+                - ''
+                - - |
+                    [cfn-auto-reloader-hook]
+                  - |
+                    triggers=post.update
+                  - >
+                    path=Resources.LaunchTemplate.Metadata.AWS::CloudFormation::Init
+                  - 'action=/opt/aws/bin/cfn-init -v '
+                  - '         --stack '
+                  - !Ref 'AWS::StackName'
+                  - '         --resource LaunchTemplate '
+                  - '         --configsets InstallAndRun '
+                  - '         --region '
+                  - !Ref 'AWS::Region'
+                  - |+
+
+                  - |
+                    # Signal the status from cfn-init
+                  - '/opt/aws/bin/cfn-signal -e $? '
+                  - '         --stack '
+                  - !Ref 'AWS::StackName'
+                  - '         --resource LaunchTemplate '
+                  - '         --region '
+                  - !Ref 'AWS::Region'
+                  - |+
+                  - |
+                    runas=root
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/awslogs/awscli.conf:
+              content: !Join
+                - ''
+                - - |
+                    [plugins]
+                    cwlogs = cwlogs
+                    [default]
+                  - region=
+                  - !Ref 'AWS::Region'
+                  - |+
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/awslogs/awslogs.conf:
+              content: !Join
+                - ''
+                - - |
+                    [general]
+                    state_file = /var/lib/awslogs/agent-state
+                  - |+
+
+                  - |                    
+                    [/zyvika/app/logs]
+                    datetime_format = %b %d %H:%M:%S
+                    file = /zyvika/app/logs/application.log
+                    buffer_duration = 5000
+                    log_stream_name = {instance_id}
+                    initial_position = start_of_file
+                    log_group_name = /zyvika/app/logs
+                  - |+
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: 'true'
+                ensureRunning: 'true'
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+            systemd:
+              awslogsd:
+                enabled: "true"
+                ensureRunning: "true"
+        Configure:
+          commands:
+            01_setup_directories:
+              command: mkdir -p /zyvika/app/ & aws s3 cp s3://proof-of-concepts-zyvika/hello-world-springboot-0.0.1-SNAPSHOT-b0902231144.zip /zyvika/app/
+            02_extract_binary:
+              command:  unzip /zyvika/app/*.zip -d /zyvika/app/
+            03_run_app:
+              command: sh /zyvika/app/scripts/run.sh &
+    Properties:
       LaunchTemplateName: !Sub ${AWS::StackName}-launch-template
       LaunchTemplateData:
         ImageId: !Ref LatestAmiId
@@ -253,7 +360,8 @@ Resources:
               - '         --resource LaunchTemplate '
               - '         --region '
               - !Ref 'AWS::Region'
-              - |+ 
+              - |+   
+
     CreationPolicy:
       ResourceSignal:
         Timeout: PT5M
