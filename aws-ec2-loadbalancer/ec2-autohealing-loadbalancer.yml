@@ -239,6 +239,8 @@ Resources:
                   - !Ref 'AWS::Region'
                   - |+
 
+                  - |
+                    interval=5
               mode: '000400'
               owner: root
               group: root
@@ -260,15 +262,6 @@ Resources:
                   - !Ref 'AWS::Region'
                   - |+
 
-                  - |
-                    # Signal the status from cfn-init
-                  - '/opt/aws/bin/cfn-signal -e $? '
-                  - '         --stack '
-                  - !Ref 'AWS::StackName'
-                  - '         --resource LaunchTemplate '
-                  - '         --region '
-                  - !Ref 'AWS::Region'
-                  - |+
                   - |
                     runas=root
               mode: '000400'
@@ -298,7 +291,7 @@ Resources:
                   - |                    
                     [/zyvika/app/logs]
                     datetime_format = %b %d %H:%M:%S
-                    file = /zyvika/app/logs/application.log
+                    file = /logs/application.log
                     buffer_duration = 5000
                     log_stream_name = {instance_id}
                     initial_position = start_of_file
@@ -319,11 +312,11 @@ Resources:
         Configure:
           commands:
             01_setup_directories:
-              command: mkdir -p /zyvika/app/ & aws s3 cp s3://proof-of-concepts-zyvika/hello-world-springboot-0.0.1-SNAPSHOT-b0902231144.zip /zyvika/app/
+              command: mkdir -p /zyvika/app/ & aws s3 cp s3://proof-of-concepts-zyvika/hello-world-springboot-0.0.1-SNAPSHOT-b0902231620.zip /zyvika/app/
             02_extract_binary:
               command:  unzip /zyvika/app/*.zip -d /zyvika/app/
             03_run_app:
-              command: sh /zyvika/app/scripts/run.sh &
+              command: sh /zyvika/app/scripts/run.sh
     Properties:
       LaunchTemplateName: !Sub ${AWS::StackName}-launch-template
       LaunchTemplateData:

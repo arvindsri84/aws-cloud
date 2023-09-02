@@ -1,9 +1,6 @@
 #!/bin/bash
 
-APP_HOME=/zyvika/app
-
-LOGS_HOME=${APP_HOME}/logs
-mkdir -p ${LOGS_HOME}
+export APP_HOME=/zyvika/app
 
 echo "***** Running the application *******"
-java -DLOGS=${LOGS_HOME} -jar ${APP_HOME}/bin/*.jar
+java -jar ${APP_HOME}/bin/*.jar &
