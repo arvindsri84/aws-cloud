@@ -8,12 +8,17 @@
     <baseDirectory>bin</baseDirectory>
     <files>
         <file>
-             <source>target/${artifactId}-${version}.jar</source>
+            <source>target/${artifactId}-${version}.jar</source>
             <outputDirectory>bin</outputDirectory>
             <fileMode>0774</fileMode>
         </file>
         <file>
             <source>src/scripts/run.sh</source>
+            <outputDirectory>scripts</outputDirectory>
+            <fileMode>0774</fileMode>
+        </file>
+        <file>
+            <source>src/scripts/cleanup.sh</source>
             <outputDirectory>scripts</outputDirectory>
             <fileMode>0774</fileMode>
         </file>

@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   EnvironmentName:
     Type: String
-    Default: "EC2 Hello World"
+    Default: "Hello World Template"
   InstanceType:
     Description: The EC2 instance type
     Type: String
@@ -25,8 +25,20 @@ Parameters:
     Type: String
     MinLength: 9
     MaxLength: 18
-    Default: 182.69.183.75/32
+    Default: 14.97.134.98/32
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  ReleaseEnv:
+    Type: 'String'
+    Default: test
+    Description: Release environment for deployment (test/prod)
+  BinaryS3Bucket:
+    Type: 'String'
+    Default: proof-of-concepts-zyvika
+    Description: S3 bucket where application binary is stored (test-zyvika-deployments/zyvika-deployments)
+  ApplicationBinary:
+    Type: 'String'
+    Default: hello-world-springboot-0.0.1-SNAPSHOT-b0906230455.zip
+    Description: Application binary with scripts folder containing run.sh and cleanup.sh.
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -118,10 +130,10 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet3
 
-  HelloWorldAppRole:
+  ApplicationRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: HelloWorldAppRole
+      RoleName: ApplicationRole
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -135,17 +147,29 @@ Resources:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
-                Action: [ "s3:Get*","s3:List*" ]
-                Resource: "arn:aws:s3:::*"
+                Action:
+                  - 's3:GetObject'
+                  - 's3:ListBucket'
+                Resource:
+                  - !Sub
+                    - 'arn:aws:s3:::${BucketName}'
+                    -  BucketName: !Ref BinaryS3Bucket
+                  - !Sub
+                    - 'arn:aws:s3:::${BucketName}/*'
+                    -  BucketName: !Ref BinaryS3Bucket
               - Effect: Allow
-                Action: [ "logs:CreateLogGroup","logs:CreateLogStream", "logs:PutLogEvents","logs:DescribeLogStreams" ]
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogStreams'
                 Resource: "*"
-  HelloWorldAppInstanceProfile:
+  ApplicationInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
       Path: "/"
       Roles:
-        - Ref: "HelloWorldAppRole"
+        - Ref: "ApplicationRole"
   ELBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -241,6 +265,7 @@ Resources:
 
                   - |
                     interval=5
+                    verbose=true
               mode: '000400'
               owner: root
               group: root
@@ -250,7 +275,7 @@ Resources:
                 - - |
                     [cfn-auto-reloader-hook]
                   - |
-                    triggers=post.update
+                    triggers=post.add,post.update,post.remove
                   - >
                     path=Resources.LaunchTemplate.Metadata.AWS::CloudFormation::Init
                   - 'action=/opt/aws/bin/cfn-init -v '
@@ -311,12 +336,20 @@ Resources:
                 ensureRunning: "true"
         Configure:
           commands:
-            01_setup_directories:
-              command: mkdir -p /zyvika/app/ & aws s3 cp s3://proof-of-concepts-zyvika/hello-world-springboot-0.0.1-SNAPSHOT-b0902231620.zip /zyvika/app/
-            02_extract_binary:
-              command:  unzip /zyvika/app/*.zip -d /zyvika/app/
-            03_run_app:
-              command: sh /zyvika/app/scripts/run.sh
+            1_cleanup:
+              command: "sh /zyvika/app/scripts/cleanup.sh"
+              ignoreErrors: "true"
+            2_setup_directories:
+              command: "mkdir -p /zyvika/app/ & aws s3 cp s3://$S3BUCKET/$APP_BINARY /zyvika/app/"
+              env:
+                S3BUCKET: !Ref BinaryS3Bucket
+                APP_BINARY: !Ref ApplicationBinary
+            3_extract_binary:
+              command:  "unzip /zyvika/app/*.zip -d /zyvika/app/"
+            4_run_app:
+              command: "sh /zyvika/app/scripts/run.sh"
+              env:
+                PROFILE: !Ref ReleaseEnv
     Properties:
       LaunchTemplateName: !Sub ${AWS::StackName}-launch-template
       LaunchTemplateData:
@@ -326,7 +359,7 @@ Resources:
         SecurityGroupIds: 
           - !Ref EC2SecurityGroup
         IamInstanceProfile:
-          Arn: !GetAtt HelloWorldAppInstanceProfile.Arn
+          Arn: !GetAtt ApplicationInstanceProfile.Arn
         UserData: !Base64
           'Fn::Join':
             - ''
@@ -373,5 +406,3 @@ Resources:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
         - !Ref PublicSubnet3
-
-      

@@ -1,5 +1,5 @@
 env:
-  name: dev
+  name: test
 spring:
   security:
     oauth2:
