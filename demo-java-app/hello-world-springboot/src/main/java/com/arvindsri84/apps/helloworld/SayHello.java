@@ -1,10 +1,8 @@
 package com.arvindsri84.apps.helloworld;
 
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +14,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.List.of;
 
 @RestController
 @RequestMapping(path = "/unsecure")
@@ -38,22 +38,22 @@ public class SayHello {
         try {
             return listFiles(decodedDir);
         } catch (Exception e) {
-            return List.of("Unable to list files of " + decodedDir, "" + e.getMessage());
+            return of("Unable to list files of " + decodedDir, "" + e.getMessage());
         }
     }
 
     @GetMapping(path = "/server/cat")
-    public String cat(String file)  {
+    public List<String> cat(String file)  {
         var decodedFilePath = new String(new Base64().decode(file.getBytes(StandardCharsets.UTF_8)));
         try {
             return getContent(decodedFilePath);
         } catch (Exception e) {
-            return "Error occurred while reading the file " + decodedFilePath + ". Error: " + e.getMessage();
+            return of("Error occurred while reading the file " + decodedFilePath, ". Error: " + e.getMessage());
         }
     }
 
-    private String getContent(String path) throws IOException {
-        return String.join("\n", Files.readAllLines(Path.of(path)));
+    private List<String> getContent(String path) throws IOException {
+        return Files.readAllLines(Path.of(path));
     }
 
     public List<String> listFiles(String dir) throws IOException {
