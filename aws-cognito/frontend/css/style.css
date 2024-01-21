@@ -1,0 +1,436 @@
+body {
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  color: #26374d;
+  background-color: #f7f7f7;
+  margin: 0;
+  padding-top: 30px;
+  padding-left: 130px;
+}
+p {
+  margin: 0px;
+}
+button {
+  font-size: 16px;
+  height: 35px;
+  border-style: solid;
+  border-color: #26374d;
+  border-width: 1px;
+  border-radius: 5px;
+  margin: 2px;
+}
+button:hover {
+  background-color: #b9b9b9;
+  cursor: pointer;
+}
+img:hover {
+  cursor: pointer;
+}
+
+.fa {
+  margin-left: 3px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table,
+td,
+th {
+  border: 1px solid grey;
+}
+
+td,
+th {
+  height: 30px;
+}
+
+th {
+  background-color: #ebeaea;
+}
+
+textarea {
+  width: 100%;
+}
+.search-header-section {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+  height: 35px;
+}
+
+.search-filter {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+}
+
+.search-filter select {
+  margin-right: 30px;
+  width: 200px;
+  font-size: 16px;
+}
+
+.search-filter span {
+  margin-right: 10px;
+  font-size: 16px;
+  padding-top: 8px;
+}
+
+.search-filter input,
+select {
+  margin-right: 30px;
+  width: 200px;
+  font-size: 16px;
+  padding-left: 5px;
+}
+
+.create-edit-main {
+  display: flex;
+  justify-content: center;
+}
+
+.create-edit-box {
+  width: 400px;
+  border: 1px solid rgb(62, 62, 62);
+  border-radius: 10px;
+  padding: 20px;
+
+  position: fixed;
+  top: 5%;
+  z-index: 100;
+  background-color: rgb(231, 230, 230);
+}
+
+.create-edit-box .cancel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.create-edit-header {
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.create-edit-box input {
+  width: 95%;
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  font-size: 16px;
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
+.create-edit-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 5px;
+  margin-bottom: 10px;
+}
+
+.create-edit-checkbox input[type="checkbox"] {
+  width: 40px;
+  height: 25px;
+  margin-bottom: 0px;
+}
+
+.create-edit-btn-box {
+  float: right;
+  padding-top: 10px;
+}
+
+.create-edit-image {
+  height: 128px;
+  margin-bottom: 10px;
+  width: 95%;
+  object-fit: contain;
+}
+
+.create-edit-msg {
+  text-align: left;
+  color: #b16767;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  font-size: 14px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 7px 12px;
+  font-size: 16px;
+
+  border: 1px solid #26374d;
+  border-radius: 5px;
+  background-color: #f1f0f0;
+  margin: 2px;
+}
+
+.custom-file-upload:hover {
+  background-color: #b9b9b9;
+  cursor: pointer;
+}
+
+/***************************************************/
+/****************** Header *************************/
+/***************************************************/
+.header-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #d7d7d7;
+  text-align: center;
+  padding: 10px;
+  height: 70px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+}
+
+.logo-section {
+  width: 100px;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 30px;
+  border-style: solid;
+  border-color: #26374d;
+  border-width: 1px;
+}
+
+.message-section {
+  flex: 1;
+  text-align: left;
+  padding-left: 30px;
+}
+
+.login-section {
+  width: 100px;
+}
+
+/***************************************************/
+/****************** Home *************************/
+/***************************************************/
+.main #welcome-section {
+  font-size: 24px;
+}
+/***************************************************/
+/****************** Jobs *************************/
+/***************************************************/
+
+.jc-create-edit-box {
+  width: 75%;
+  border: 1px solid rgb(62, 62, 62);
+  border-radius: 10px;
+  padding: 20px;
+
+  position: fixed;
+  top: 5%;
+  z-index: 100;
+  background-color: rgb(231, 230, 230);
+  height: 500px;
+  overflow-x: hidden; /*for hiding horizontal scroll bar*/
+  overflow-y: auto; /*for vertical scroll bar*/
+}
+
+.jc-create-edit-box .cancel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.jc-main,
+.jc-criteria,
+.jc-employer,
+.jc-source,
+.jc-summary {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  border-bottom: 1px dashed rgb(62, 62, 62);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.jc-create-edit-image {
+  width: 250px;
+  object-fit: contain;
+}
+
+.postings {
+  display: grid;
+  grid-template-columns: 25% 25% 50%;
+  border-bottom: 1px dashed rgb(62, 62, 62);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.postings-image {
+  height: 350px;
+  object-fit: contain;
+}
+
+.jc-field {
+  width: 200px;
+  padding-top: 10px;
+}
+.jc-field input {
+  width: 100%;
+  height: 25px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  color: rgb(81, 81, 81);
+  font-size: 14px;
+  padding-left: 5px;
+}
+
+.header {
+  font-size: 12px;
+  margin: 1px 1px 3px 2px;
+  color: rgb(81, 81, 81);
+  text-align: left;
+}
+
+.msg {
+  font-size: 12px;
+  margin: 3px 2px 3px 2px;
+  color: rgb(255, 92, 92);
+}
+
+
+/***************************************************/
+/****************** login *************************/
+/***************************************************/
+.login-main {
+  display: flex;
+  justify-content: center;
+}
+
+.login-box {
+  width: 300px;
+  border: 1px solid rgb(62, 62, 62);
+  border-radius: 10px;
+  padding: 20px;
+
+  position: fixed;
+  z-index: 100;
+  background-color: rgb(231, 230, 230);
+}
+
+.login-box .cancel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.login-error {
+  text-align: left;
+  color: #b16767;
+  margin-bottom: 10px;
+  font-size: 14px;
+  margin-left: 2px;
+}
+
+.login-field {
+  margin-bottom: 20px;
+}
+
+.login-field input {
+  width: 275px;
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  font-size: 16px;
+  padding-left: 10px;
+}
+
+.login-field .error {
+  font-size: 12px;
+  margin: 3px 2px 3px 2px;
+  color: rgb(255, 92, 92);
+}
+
+.login-box-section {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+}
+
+.signup-section p {
+  font-size: 14px;
+  padding-top: 5px;
+}
+
+/***************************************************/
+/****************** main *************************/
+/***************************************************/
+.main {
+  flex: 1;
+  text-align: center;
+  padding: 90px;
+}
+
+/***************************************************/
+/****************** nav *************************/
+/***************************************************/
+.menu {
+  background-color: #ebeaea;
+  width: 150px;
+  position: fixed;
+  top: 90px;
+  bottom: 0px;
+  left: 0px;
+}
+.menu-active {
+  cursor: pointer;
+  background-color: #f7f7f7;
+  font-weight: bold;
+  text-decoration: underline;
+}
+.menu-item {
+  height: 40px;
+  vertical-align: middle;
+  padding-left: 20px;
+  padding-top: 20px;
+}
+.menu-item:hover {
+  cursor: pointer;
+  background-color: #f7f7f7;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.message-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+  border-radius: 5px;
+  display: none;
+}
+
+.message-text {
+  margin: 0;
+}
+
+.success {
+  background-color: rgb(80, 122, 80);
+  color: white;
+}
+
+.error {
+  background-color: rgb(255, 183, 183);
+  color: white;
+}

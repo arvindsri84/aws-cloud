@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AWS Cognito Test App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&family=Spectral+SC&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <header class="header-section">
+      <div id="login-welcome-msg" class="message-section"></div>
+      <div class="login-section">
+        <button id="login-box-show-btn" class="login-btn">Login</button>
+        <button id="logout-btn" class="login-btn">Logout</button>
+      </div>
+    </header>
+
+    <div id="login-main-box" class="login-main" style="display: none">
+      <div class="login-box">
+        <div id="login-box-msg" class="login-error"></div>
+
+        <div id="login-name" class="login-field">
+          <input
+            id="login-name-in"
+            class="textbox"
+            placeholder="Name"
+            type="text"
+          />
+          <div id="login-name-in-error" class="error"></div>
+        </div>
+        
+        <div id="login-phone" class="login-field">
+          <input
+            id="login-phone-in"
+            class="textbox"
+            placeholder="Phone"
+            type="phone"
+          />
+          <div id="login-phone-in-error" class="error"></div>
+        </div>
+
+        <div id="login-confirm" class="login-field">
+          <input id="login-confirm-in" class="textbox" placeholder="Verification Code" type="text" />
+          <div id="login-confirm-in-error" class="error"></div>
+        </div>
+
+        <div class="login-box-section">
+          <button id="signin-btn">Login</button>
+          <button id="confirm-signin-btn">Confirm login</button>
+          <button id="signup-btn">Register</button>
+        </div>
+
+        <div class="signup-section">
+          <p id="reg-nav">
+            Don't have an account? <a id="signup-href" href="#">Sign Up</a>
+          </p>
+          <p id="login-nav">
+            Already have an account? <a id="signin-href" href="#">Sign In</a>
+          </p>
+          <p id="resent-code-nav">
+            Didn't receive a code?
+            <a id="resend-code-href" href="#">Send a new code</a>
+          </p>
+        </div>
+        <span id="login-box-cancel-btn" class="cancel"
+          ><i class="fa fa-times" aria-hidden="true"></i
+        ></span>
+      </div>
+    </div>
+
+
+    <main class="main">
+      <div id="welcome-section">
+        Welcome to the app <span id="release-env"></span> 
+      </div>
+    </main>
+
+    <script src="scripts/lib/amazon-cognito-identity.min.js"></script>
+    <script src="scripts/login-service.js"></script>
+    <script src="scripts/login.js"></script>
+  </body>
+</html>
